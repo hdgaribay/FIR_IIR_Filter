@@ -7,8 +7,8 @@ fs = 48000
 wp = 3000
 ws = 4000
 worN = 8192
-gpass = 0.1
-gstop = 60
+gpass = 0.09
+gstop = 61
 ord,wn = scipy.signal.ellipord(wp,ws,gpass,gstop,fs = fs)
 sos = scipy.signal.ellip(ord,gpass,gstop,wn, output= "sos", fs = fs)
 
@@ -43,31 +43,32 @@ t = np.arange(0,0.1,1/fs)
 test_sig = scipy.signal.square(2*np.pi*100*t)
 y_iir = scipy.signal.sosfilt(sos, test_sig)
 
+def main():
 # plot
-fig, ax = plt.subplots(2,2)
-plot_mag(R,ax[0,0])
-plot_phase(R,ax[0,1])
-plot_gd(R,ax[1,0])
+    fig, ax = plt.subplots(2,2)
+    plot_mag(R,ax[0,0])
+    plot_phase(R,ax[0,1])
+    plot_gd(R,ax[1,0])
 
-ax[1,1].plot(R["h"][:300])   
-ax[1,1].set(xlabel="n", ylabel="Amplitude", title="Impulse Response (IIR)")
-ax[1,1].grid(True)
+    ax[1,1].plot(R["h"][:300])   
+    ax[1,1].set(xlabel="n", ylabel="Amplitude", title="Impulse Response (IIR)")
+    ax[1,1].grid(True)
 
-fig1,ax1 = plt.subplots(figsize = (8,6))
-z_iir, p_iir, _ = scipy.signal.sos2zpk(sos)
-pz_plot(z_iir,p_iir,ax1, "IIR Filter Pole-Zero Plot")
+    fig1,ax1 = plt.subplots(figsize = (8,6))
+    z_iir, p_iir, _ = scipy.signal.sos2zpk(sos)
+    pz_plot(z_iir,p_iir,ax1, "IIR Filter Pole-Zero Plot")
 
-fig2,ax2 = plt.subplots(figsize = (8,6))
-ax2.plot(t,test_sig,"-b",label = "Input"); ax2.set_xlim(0,0.1)
-ax2.plot(t,y_iir,"-r",label = "IIR Output")
-ax2.set(ylabel = "Amplitude",xlabel = "Time", title = "Input Signal/Filtered Output")
-ax2.legend(loc = "center right")
-ax2.grid(True)
+    fig2,ax2 = plt.subplots(figsize = (8,6))
+    ax2.plot(t,test_sig,"-b",label = "Input"); ax2.set_xlim(0,0.1)
+    ax2.plot(t,y_iir,"-r",label = "IIR Output")
+    ax2.set(ylabel = "Amplitude",xlabel = "Time", title = "Input Signal/Filtered Output")
+    ax2.legend(loc = "center right")
+    ax2.grid(True)
 
 
-fig.tight_layout()
-plt.show()
+    fig.tight_layout()
+    plt.show()
     
-
-
+if __name__ == "__main__":
+    main()
 
