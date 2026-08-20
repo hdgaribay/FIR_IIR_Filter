@@ -36,6 +36,7 @@ mag = 20 * np.log10(np.abs(H))
 print("Ripple:", mag[f<=3000].max()-mag[f<=3000].min())
 print("Worst Stopband:", mag[f>=4000].max())
 
+# round to nearest, away from 0
 def round_to_nearest(acc,acc_shift):
     if acc_shift == 0:
         return acc
@@ -43,7 +44,7 @@ def round_to_nearest(acc,acc_shift):
     if acc >= 0:
         return (acc + half) >> acc_shift
     else:
-        return -(((-acc) + half) >> acc_shift)
+        return -(((-acc) + half) >> acc_shift) 
 # fixed point fir implementation
 def fir_fixed(x_int,coeff_int,acc_shift):
     num_taps = len(coeff_int)
@@ -66,7 +67,7 @@ chirp = scipy.signal.chirp(t,0,0.3,fs/2,"linear")
 tones = (np.sin(2*np.pi*1000*t) + np.sin(2*np.pi*3000*t) + np.sin(2*np.pi*10000*t))/3
 np.random.seed(0)
 noise = np.random.uniform(-1,1,len(t))
-x = np.concatenate([chirp,tones,noise]) * 0.9 # test_signal
+x = np.concatenate([chirp,tones,noise]) * 0.9 # chirp + tones + noise
 quant_x = np.round(x * 32767).astype(np.int64)
 _,quant_coeff = quantize(16,15,FIR.taps * 4)
 output = fir_fixed(quant_x,quant_coeff, 17)
@@ -86,5 +87,12 @@ print("output range:", output.min(), output.max())
 with open("coeffs.hex", "w") as f:
     for v in quant_coeff:
         f.write(format(v & 0xFFFF, "04x") + "\n") # keep lowest 16 bits, format as hex
+with open("stimulus.hex","w") as f:
+    for v in quant_x:
+        f.write(format(int(v) & 0xFFFF, "04x") + "\n")
+with open("golden.hex","w") as f:
+    for v in output:
+        f.write(format(int(v) & 0xFFFF, "04x") + "\n")
+
 
 
