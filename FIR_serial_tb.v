@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-module FIR_tb;
+module FIR_serial_tb;
 
 localparam NUM_TAPS = 167;
 localparam N_SAMPLES = 129600;
@@ -32,7 +32,7 @@ fir_serial uut(
 
 initial begin
     $dumpfile("firdump.vcd");
-    $dumpvars(0,FIR_tb);
+    $dumpvars(0,fir_serial);
     $readmemh("golden.hex", gold);
     $readmemh("stimulus.hex", stim);
 end

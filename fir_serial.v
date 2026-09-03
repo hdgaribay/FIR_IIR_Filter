@@ -24,7 +24,7 @@ initial begin
     $readmemh("coeffs.hex",coeffs);
 end
 
-wire [7:0] rd_idx = (wr_ptr >= tap_idx) ? (wr_ptr - tap_idx) : wr_ptr + NUM_TAPS - tap_idx; // read index to buffer
+reg [7:0] rd_idx_r;
 
 localparam IDLE = 2'd0, MAC = 2'd1, DONE = 2'd2;
 reg [1:0] state;
@@ -44,6 +44,7 @@ always @(posedge clk or negedge rst_n) begin
         wr_ptr <= 8'd0;
         tap_idx <= 8'd0;
         out_valid <= 1'b0;
+        rd_idx_r <= 8'd0;
     end else begin
         out_valid <= 1'b0;
     case(state)
@@ -52,11 +53,19 @@ always @(posedge clk or negedge rst_n) begin
         buffer[wr_ptr] <= sample_in;
         tap_idx <= 8'd0;
         state <= MAC;
+        rd_idx_r <= wr_ptr;
     end
     MAC: begin
-    acc <= acc + buffer[rd_idx] * coeffs[tap_idx];
-    if (tap_idx == NUM_TAPS - 1) state <= DONE; 
-    else tap_idx <= tap_idx + 1'b1;
+    acc <= acc + buffer[rd_idx_r] * coeffs[tap_idx]; // MAC
+    if (tap_idx == NUM_TAPS - 1) begin
+    state <= DONE; 
+    end else begin
+    tap_idx <= tap_idx + 1'b1;
+    if (wr_ptr >= (tap_idx + 1'b1)) // pre compute rd_idx_r for the next cycle
+    rd_idx_r <= wr_ptr - (tap_idx + 1'b1);
+    else
+    rd_idx_r <= wr_ptr + NUM_TAPS - (tap_idx + 1'b1);
+        end
     end
     DONE: begin
         sample_out <= result[DATA_W-1:0];
