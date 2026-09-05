@@ -48,23 +48,26 @@ always @(posedge clk or negedge rst_n) begin
     end
 
 
-wire signed [ACC_W-1:0] acc;
-assign acc = acc_reg[NUM_TAPS-2] + mult_prod[0];
+reg signed [ACC_W-1:0] acc_r;
+always @(posedge clk) begin
+    if (!rst_n) acc_r <= {ACC_W{1'b0}};
+    else acc_r <= acc_reg[NUM_TAPS-2] + mult_prod[0];
+end
 // Rounding
 localparam signed [ACC_W - 1:0] HALF = 1 << (ACC_SHIFT-1); 
-wire signed [ACC_W - 1:0] acc_abs = (acc < 0) ? -acc : acc;
+wire signed [ACC_W - 1:0] acc_abs = (acc_r < 0) ? -acc_r : acc_r;
 wire signed [ACC_W - 1:0] acc_rounded = (acc_abs + HALF) >>> ACC_SHIFT;
-wire signed [ACC_W - 1:0] result = (acc < 0 ) ? -acc_rounded : acc_rounded;
+wire signed [ACC_W - 1:0] result = (acc_r < 0 ) ? -acc_rounded : acc_rounded;
 
-reg valid_pipe; // delay output valid by 2 clock cycles
+reg [1:0] valid_pipe; // delay output valid by 3 clock cycles
 always @(posedge clk or negedge rst_n) begin
 if (!rst_n) begin
 filter_out <= {DATA_W{1'b0}};
 output_valid <= 1'b0;
 valid_pipe <= 0;
 end else begin
-valid_pipe <= input_valid;
-output_valid <= valid_pipe;
+valid_pipe <= {valid_pipe[0],input_valid};
+output_valid <= valid_pipe[1];
 if (result > MAX_POS)
     filter_out <= MAX_POS;
 else if (result < MAX_NEG)
