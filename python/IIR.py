@@ -65,10 +65,15 @@ def main():
     ax2.legend(loc = "center right")
     ax2.grid(True)
 
-
-    fig.tight_layout()
-    plt.show()
     
+
+    fig1.tight_layout()
+    fig1.savefig("4_IIR_Pole-Zero_plot.png",dpi = 300, bbox_inches = "tight")
+
+    fig2.tight_layout()
+    fig2.savefig("5_IIR_signal_filtering.png",dpi = 300, bbox_inches = "tight")
+
+    plt.show()
 if __name__ == "__main__":
     main()
 

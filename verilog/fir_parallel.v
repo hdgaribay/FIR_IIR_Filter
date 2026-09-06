@@ -48,7 +48,7 @@ always @(posedge clk or negedge rst_n) begin
     end
 
 
-reg signed [ACC_W-1:0] acc_r;
+reg signed [ACC_W-1:0] acc_r; // acc pipeline reg
 always @(posedge clk) begin
     if (!rst_n) acc_r <= {ACC_W{1'b0}};
     else acc_r <= acc_reg[NUM_TAPS-2] + mult_prod[0];
@@ -59,7 +59,7 @@ wire signed [ACC_W - 1:0] acc_abs = (acc_r < 0) ? -acc_r : acc_r;
 wire signed [ACC_W - 1:0] acc_rounded = (acc_abs + HALF) >>> ACC_SHIFT;
 wire signed [ACC_W - 1:0] result = (acc_r < 0 ) ? -acc_rounded : acc_rounded;
 
-reg [1:0] valid_pipe; // delay output valid by 3 clock cycles
+reg [1:0] valid_pipe; 
 always @(posedge clk or negedge rst_n) begin
 if (!rst_n) begin
 filter_out <= {DATA_W{1'b0}};
@@ -67,7 +67,7 @@ output_valid <= 1'b0;
 valid_pipe <= 0;
 end else begin
 valid_pipe <= {valid_pipe[0],input_valid};
-output_valid <= valid_pipe[1];
+output_valid <= valid_pipe[1]; // delay output valid by 3 clock cycles
 if (result > MAX_POS)
     filter_out <= MAX_POS;
 else if (result < MAX_NEG)

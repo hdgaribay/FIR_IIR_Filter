@@ -73,8 +73,8 @@ def centered(N):
     return np.arange(len(N)) - len((N-1))/2 # center impulse responses of different length
 
 coeff = design_fir(fs,fc,N,beta)      
-R1 = responses(coeff, fs, worN = 8192)
-R2 = responses(taps,fs,worN = 8192)
+R1 = responses(coeff, fs, worN = 8192) # windowed-sinc responses
+R2 = responses(taps,fs,worN = 8192) # parks-mclellan responses
 fig, ax = plt.subplots(2, 2, figsize=(8,6))
 def main():
     plot_mag(R1, ax[0,0], label = "Windowed"); ax[0,0].axhline(-60, color='r', ls='--', lw=0.8)
@@ -103,8 +103,23 @@ def main():
     ax2.grid(True)
 
     fig.tight_layout()
+    fig.savefig('1_FIR_filter_comparison.png', dpi=300, bbox_inches='tight')
+
+    fig1.tight_layout()
+    fig1.savefig('2_FIR_pole_zero_plot.png', dpi=300, bbox_inches='tight')
+
+    fig2.tight_layout()
+    fig2.savefig('3_FIR_signal_filtering.png', dpi=300, bbox_inches='tight')
     plt.show()
 
+pb = (R1["f"] <= 3000)
+sb = (R1["f"] >= 4000)
+worst_sinc = R1["mag"][sb].max()
+worst_parks = R2["mag"][sb].max()
+print(f"worst stopband(windowed sinc): {worst_sinc:.2f} dB")
+print(f"passband ripple(windowed sinc): {max(R1["mag"][pb])-min(R1["mag"][pb])} dB")
+print(f"worst stopband(parks-mclellan): {worst_parks:.2f} dB")
+print(f"passband ripple(parks-mclellan): {max(R2["mag"][pb])-min(R2["mag"][pb])} dB")
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.signal
-import FIR, IIR
+import python.FIR as FIR, IIR
 
 fs = 48000
 
