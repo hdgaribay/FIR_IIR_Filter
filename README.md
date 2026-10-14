@@ -3,7 +3,7 @@
 ## Overview
 A fixed-point lowpass FIR filter designed in Python and implemented in Verilog for an Artix-7 FPGA (Nexys A7-100T). The filter is designed using two methods (windowed-sinc and Parks-McClellan) and compared against a minimum-order elliptic IIR meeting the same spec. Both a serial single-MAC and a parallel transposed-form architecture were implemented and verified against a Python fixed-point reference across 126,000 samples. Note that the minimum order IIR filter was simply used for comparison, the hardware implementation solely focused on the FIR.
 
-key results: The Parks-Mclellan FIR design met spec at 167 taps, while the windowed-sinc method met spec at 197 taps. Scaling the coefficients recovered ~12dB of stopband floor. the serial architecture uses 1 DSP48 at 169 cycles per sample while the parallel uses 152 DSP48s at 1 cycle per sample, both meeting timing at 100 MHz.
+key results: The Parks-Mclellan FIR design met spec at 167 taps, while the windowed-sinc method met spec at 197 taps. Scaling the coefficients recovered ~12dB of stopband floor. the serial architecture uses 1 DSP48 at 169 cycles per sample while the parallel uses 167 DSP48s at 1 cycle per sample, both meeting timing at 100 MHz.
 
 ## Specification
 48kHz sample rate, 3kHz passband edge, 4kHz stopband edge, 0.1dB passband ripple, 60 dB stopband attenuation.
@@ -28,7 +28,7 @@ key results: The Parks-Mclellan FIR design met spec at 167 taps, while the windo
 
 | | Serial MAC | Parallel transposed |
 |---|---|---|
-| DSP48E1 | 1 |152 |
+| DSP48E1 | 1 |167 |
 | LUTs |145 | 836|
 | Flip-flops |94 |674 |
 | Latency (cycles) | 169 | 3 |
